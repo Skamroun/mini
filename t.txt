@@ -1,0 +1,10 @@
+echo $OLDPWD $PWD ; cd ./.. ; echo $OLDPWD $PWD /bin/bash ssss sswsw | /bin/ls | /bin /bin/ ./bin tttt=tertr
+
+
+/bin/ls > t.txt -la -v
+
+/bin/ls -la && echo "papapa" | /bin/echo pa || lala
+
+SEGV == /bin/ls -la && echo "papapa" | /bin/echo pa || lala >>
+
+/bin/ls >> fd.txt
