@@ -30,17 +30,10 @@ typedef struct s_params
     struct s_params *next;
 }   t_params;
 
-typedef struct s_exec
-{
-    t_token *cmds;
-}   t_exec;
-
-
 typedef struct s_var
 {
     t_token *head;
     t_token *tmp;
-    t_token *cmd_to_execute;
     size_t len;
     size_t start;
     size_t i;
@@ -52,6 +45,10 @@ typedef struct s_var
     int index;
 } t_var;
 
+typedef struct s_exec
+{
+    t_token *cmds;
+}   t_exec;
 
 int parse_line(char *line);
 
@@ -86,5 +83,5 @@ int ft_pwd();
 int ft_export(char **arg);
 int ft_unset(char **arg);
 int ft_env();
-int ft_exit(char **arg);
+
 #endif
