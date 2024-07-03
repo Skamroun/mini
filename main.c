@@ -9,8 +9,8 @@ int main(void) {
     t_var var;
     char *line;
 
-    init_var(&var);
     while (1) {
+        init_var(&var);
         line = readline("minishell$> ");
         if (!line)
             return (1);
@@ -18,6 +18,8 @@ int main(void) {
         if (parse_line(line))
         {
             free(line);
+            ft_lstclear(&var.head,free);
+            var.head = NULL;
             return (1);
         }
     }

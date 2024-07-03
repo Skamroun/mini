@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 
 # Minishell
 CFILES = main.c parsing.c helper_functions.c execution.c built_in.c

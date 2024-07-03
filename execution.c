@@ -32,33 +32,35 @@ int execute_built_in(char **arg)
     else if (ft_strncmp(arg[0], "unset", 5) == 0)
         ft_unset(arg);
     else if (ft_strncmp(arg[0], "exit", 4) == 0)
-        exit(1);
+        ft_exit(arg);
     return 0;
 }
 
 int execute_cmd(char *cmd)
 {
     int pid;
-    int status;
     char **args;
 
-    pid = fork();
     args = ft_split(cmd, ' ');
-    if (pid == 0 && !is_buit_in(args[0]))
+    if (!is_buit_in(args[0]))
     {
-        execve(args[0], args, NULL);
-        free_double_pointer(&args);
-        exit(0);
+        pid = fork();
+        if (pid == 0 && !is_buit_in(args[0]))
+        {
+            execve(args[0], args, NULL);
+            free_double_pointer(&args);
+            exit(0);
+        }
+        else
+        {
+            waitpid(pid, 0, 0);
+            free_double_pointer(&args);
+        }
     }
     else
     {
-        waitpid(pid, &status, 0);
         execute_built_in(args);
-        if (WIFEXITED(status))
-        {
-            free_double_pointer(&args);
-            return WEXITSTATUS(status);
-        }
+        free_double_pointer(&args);
     }
     return 0;
 }
@@ -206,49 +208,35 @@ int execute_dgreater(char *cmd1, char *cmd2)
 }
 int execute_cmds(t_var *var)
 {
-    t_exec exec;
-
-    exec.cmds = tokenizer_params(var);
-    if (exec.cmds->type != CMD)
-        ft_lstclear(&exec.cmds, free);
-    else
+    var->cmd_to_execute = tokenizer_params(var);
+    var->head = var->cmd_to_execute;
+    if (var->cmd_to_execute->type == CMD)
     {
-        while (exec.cmds != NULL)
+        while (var->cmd_to_execute != NULL)
         {
-            if (exec.cmds->next != NULL && exec.cmds->next->type > 0)
+            if (var->cmd_to_execute->next != NULL && var->cmd_to_execute->next->type > 0)
             {
-                // if (exec.cmds->next->type == PIPE && exec.cmds->next->next
-                //     && exec.cmds->next->next->type == CMD)
-                //     execute_pipe(exec.cmds->content, exec.cmds->next->next->content);
-                if (exec.cmds->next->type == AND)
-                {
-                    execute_and(exec.cmds->content);
-                    exec.cmds = exec.cmds->next;
-                }
-                else if (exec.cmds->next->type == GREATER && exec.cmds->next->next)
-                    execute_greater(exec.cmds->content, exec.cmds->next->next->content);
-                // else if (exec.cmds->next->type == LESS)
-                //     execute_less(exec.cmds->content, exec.cmds->next->content);
+                // if (var->cmd_to_execute->next->type == PIPE && var->cmd_to_execute->next->next
+                //     && var->cmd_to_execute->next->next->type == CMD)
+                //     execute_pipe(var->cmd_to_execute->content, var->cmd_to_execute->next->next->content);
+                if (var->cmd_to_execute->next->type == AND)
+                    execute_and(var->cmd_to_execute->content);
+                else if (var->cmd_to_execute->next->type == GREATER && var->cmd_to_execute->next->next)
+                    execute_greater(var->cmd_to_execute->content, var->cmd_to_execute->next->next->content);
+                // else if (var->cmd_to_execute->next->type == LESS)
+                //     execute_less(var->cmd_to_execute->content, var->cmd_to_execute->next->content);
 
-                else if (exec.cmds->next->type == DGREATER && exec.cmds->next->next)
-                        execute_dgreater(exec.cmds->content, exec.cmds->next->next->content);
-                // else if (exec.cmds->next->type == DLESS)
-                //     execute_dless(exec.cmds->content, exec.cmds->next->content);
-                // else if (exec.cmds->next->type == DQUESTION)
-                //     execute_dquestion(exec.cmds->content, exec.cmds->next->content);
-                exec.cmds = exec.cmds->next;
+                else if (var->cmd_to_execute->next->type == DGREATER && var->cmd_to_execute->next->next)
+                        execute_dgreater(var->cmd_to_execute->content, var->cmd_to_execute->next->next->content);
+                // else if (var->cmd_to_execute->next->type == DLESS)
+                //     execute_dless(var->cmd_to_execute->content, var->cmd_to_execute->next->content);
+                // else if (var->cmd_to_execute->next->type == DQUESTION)
+                //     execute_dquestion(var->cmd_to_execute->content, var->cmd_to_execute->next->content);
+                var->cmd_to_execute = var->cmd_to_execute->next;
             }
             else
-            {
-                if (execute_cmd(exec.cmds->content))
-                {
-                    ft_lstclear(&exec.cmds, free);
-                    exit(-1);
-                }
-                ft_lstclear(&exec.cmds, free);
-                break;
-                exec.cmds = exec.cmds->next;
-            }
+                execute_cmd(var->cmd_to_execute->content);
+            var->cmd_to_execute = var->cmd_to_execute->next;
         }
     }
 

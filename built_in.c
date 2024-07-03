@@ -16,22 +16,36 @@ int ft_cd(char **arg)
     }
     return 0;
 }
+size_t ft_strlen_double(char **arr)
+{
+    size_t i = 0;
+
+    if (arr == NULL)
+        return 0;
+    while (arr[i] != NULL)
+        i++;
+    return i;
+}
+
 int ft_echo(char **arg)
 {
     int i = 1;
     int flag = 0;
 
-    if (ft_strncmp(arg[1], "-n", 2) == 0)
+    if (ft_strlen_double(arg) > 1)
     {
-        flag = 1;
-        i++;
-    }
-    while (arg[i])
-    {
-        printf("%s", arg[i]);
-        if (arg[i + 1])
-            printf(" ");
-        i++;
+        if (ft_strncmp(arg[1], "-n", 2) == 0)
+        {
+            flag = 1;
+            i++;
+        }
+        while (arg[i])
+        {
+            printf("%s", arg[i]);
+            if (arg[i + 1])
+                printf(" ");
+            i++;
+        }
     }
     if (flag == 0)
         printf("\n");
@@ -82,6 +96,8 @@ int ft_unset(char **arg)
 int ft_exit(char **arg)
 {
     free_double_pointer(&arg);
+    // ft_lstclear(&var->head,free);
+    // var->head = NULL;
     exit(1);
     return 0;
 }
